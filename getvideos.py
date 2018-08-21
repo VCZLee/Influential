@@ -1,23 +1,35 @@
 import requests
-import math
 
-base_url = "https://www.googleapis.com/youtube/v3/search?"
+playlist_url = "https://www.googleapis.com/youtube/v3/channels?"
 
-part = "snippet"
+playlist_part = "contentDetails"
 channel_id = "UCNIkB2IeJ-6AmZv7bQ1oBYg" #arXiv
 channel_id = "UCsvn_Po0SmunchJYOWpOxMg" #dunkey
-order_by = "date"
+
+playlist_parameters = {"key": api_key,
+                       "part": playlist_part,
+                       "id": channel_id}
+
+playlist_query = requests.get(playlist_url, playlist_parameters)
+playlist_results = playlist_query.json()
+playlist_id = playlist_results["items"][0][playlist_part]["relatedPlaylists"]["uploads"]
+print(playlist_id)
+
+video_url = "https://www.googleapis.com/youtube/v3/playlistItems?"
+video_part = "snippet"
 max_results = 50
+video_parameters = {"key": api_key,
+                    "part": video_part,
+                    "playlistId": playlist_id,
+                    "maxResults": max_results,
+                    "pageToken": ""}
 
-parameters = {"key": api_key,
-              "part": part,
-              "channelId": channel_id,
-              "order": order_by,
-              "maxResults": max_results}
 
-query = requests.get(base_url, parameters)
-results = query.json()
-num_videos = results["pageInfo"]["totalResults"]
-if num_videos > max_results:
-    num_loops = math.ceil(num_videos/max_results) - 1
-    print("Need to fetch " + str(num_loops) + " more pages")
+video_query = requests.get(video_url, video_parameters)
+video_results = video_query.json()
+print(video_query.url)
+while "nextPageToken" in video_results:
+    video_parameters["pageToken"] = video_results["nextPageToken"]
+    video_query = requests.get(video_url, video_parameters)
+    video_results = video_query.json()
+    print(video_query.url)
