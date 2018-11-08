@@ -1,8 +1,9 @@
 import requests
 import numpy as np
 import pandas as pd
+import re
 import datetime
-
+import string
 
 def get_playlist_id(channel_id, api_key):
     playlist_url = "https://www.googleapis.com/youtube/v3/channels?"
@@ -54,7 +55,7 @@ dunkey = "UCsvn_Po0SmunchJYOWpOxMg" #dunkey
 video_columns = ["title", "description", "publishedAt"]
 dataframe_columns = ["id"] + video_columns
 
+
 uploads = get_playlist_id(dunkey, api_key)
 video_dataframe = pd.DataFrame(get_videos(uploads, video_columns, api_key), columns=dataframe_columns)
-
 video_dataframe["publishedAt"]= publishedAt_parser(video_dataframe["publishedAt"])
